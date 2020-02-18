@@ -29,7 +29,7 @@ def create_dataset(request):
     print (cv2.__version__)
     # Detect face
     #Creating a cascade image classifier
-    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/ml/haarcascade_frontalface_default.xml')
+    faceDetect = cv2.CascadeClassifier(settings.BASE_DIR+'/ml/haarcascade_frontalface_default.xml')
     #camture images from the webcam and process and detect the face
     # takes video capture id, for webcam most of the time its 0.
     cam = cv2.VideoCapture(0)
@@ -59,7 +59,7 @@ def create_dataset(request):
             # So now we captured a face, we need to write it in a file
             sampleNum = sampleNum+1
             # Saving the image dataset, but only the face part, cropping the rest
-            cv2.imwrite(BASE_DIR+'/ml/dataset/user.'+str(id)+'.'+str(sampleNum)+'.jpg', gray[y:y+h,x:x+w])
+            cv2.imwrite(settings.BASE_DIR+'/ml/dataset/user.'+str(id)+'.'+str(sampleNum)+'.jpg', gray[y:y+h,x:x+w])
             # @params the initial point of the rectangle will be x,y and
             # @params end point will be x+width and y+height
             # @params along with color of the rectangle
@@ -100,7 +100,7 @@ def trainer(request):
     #Creating a recognizer to train
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     #Path of the samples
-    path = BASE_DIR+'/ml/dataset'
+    path = settings.BASE_DIR+'/ml/dataset'
 
     # To get all the images, we need corresponing id
     def getImagesWithID(path):
@@ -141,20 +141,20 @@ def trainer(request):
     recognizer.train(faces, ids)
 
     # Save the recogzier state so that we can access it later
-    recognizer.save(BASE_DIR+'/ml/recognizer/trainingData.yml')
+    recognizer.save(settings.BASE_DIR+'/ml/recognizer/trainingData.yml')
     cv2.destroyAllWindows()
 
     return redirect('/')
 
 
 def detect(request):
-    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/ml/haarcascade_frontalface_default.xml')
+    faceDetect = cv2.CascadeClassifier(settings.BASE_DIR+'/ml/haarcascade_frontalface_default.xml')
 
     cam = cv2.VideoCapture(0)
     # creating recognizer
     rec = cv2.face.LBPHFaceRecognizer_create();
     # loading the training data
-    rec.read(BASE_DIR+'/ml/recognizer/trainingData.yml')
+    rec.read(settings.BASE_DIR+'/ml/recognizer/trainingData.yml')
     getId = 0
     font = cv2.FONT_HERSHEY_SIMPLEX
     userId = 0
@@ -191,7 +191,7 @@ def detect(request):
     return redirect('/')
 
 def eigenTrain(request):
-    path = BASE_DIR+'/ml/dataset'
+    path = settings.BASE_DIR+'/ml/dataset'
 
     # Fetching training and testing dataset along with their image resolution(h,w)
     ids, faces, h, w= df.getImagesWithID(path)
@@ -263,7 +263,7 @@ def eigenTrain(request):
     '''
         -- Saving classifier state with pickle
     '''
-    svm_pkl_filename = BASE_DIR+'/ml/serializer/svm_classifier.pkl'
+    svm_pkl_filename = settings.BASE_DIR+'/ml/serializer/svm_classifier.pkl'
     # Open the file to save as pkl file
     svm_model_pkl = open(svm_pkl_filename, 'wb')
     pickle.dump(clf, svm_model_pkl)
@@ -272,7 +272,7 @@ def eigenTrain(request):
 
 
 
-    pca_pkl_filename = BASE_DIR+'/ml/serializer/pca_state.pkl'
+    pca_pkl_filename = settings.BASE_DIR+'/ml/serializer/pca_state.pkl'
     # Open the file to save as pkl file
     pca_pkl = open(pca_pkl_filename, 'wb')
     pickle.dump(pca, pca_pkl)
@@ -287,13 +287,13 @@ def eigenTrain(request):
 def detectImage(request):
     userImage = request.FILES['userImage']
 
-    svm_pkl_filename =  BASE_DIR+'/ml/serializer/svm_classifier.pkl'
+    svm_pkl_filename =  settings.BASE_DIR+'/ml/serializer/svm_classifier.pkl'
 
     svm_model_pkl = open(svm_pkl_filename, 'rb')
     svm_model = pickle.load(svm_model_pkl)
     #print "Loaded SVM model :: ", svm_model
 
-    pca_pkl_filename =  BASE_DIR+'/ml/serializer/pca_state.pkl'
+    pca_pkl_filename =  settings.BASE_DIR+'/ml/serializer/pca_state.pkl'
 
     pca_model_pkl = open(pca_pkl_filename, 'rb')
     pca = pickle.load(pca_model_pkl)
@@ -304,7 +304,7 @@ def detectImage(request):
     '''
     im = Image.open(userImage)
     #im.show()
-    imgPath = BASE_DIR+'/ml/uploadedImages/'+str(userImage)
+    imgPath = settings.BASE_DIR+'/ml/uploadedImages/'+str(userImage)
     im.save(imgPath, 'JPEG')
 
     '''
