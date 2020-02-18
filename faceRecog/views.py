@@ -16,7 +16,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import pickle
 
-from settings import BASE_DIR
+from django.conf import settings
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
@@ -26,7 +26,7 @@ def errorImg(request):
 def create_dataset(request):
     #print request.POST
     userId = request.POST['userId']
-    print cv2.__version__
+    print (cv2.__version__)
     # Detect face
     #Creating a cascade image classifier
     faceDetect = cv2.CascadeClassifier(BASE_DIR+'/ml/haarcascade_frontalface_default.xml')
@@ -195,7 +195,7 @@ def eigenTrain(request):
 
     # Fetching training and testing dataset along with their image resolution(h,w)
     ids, faces, h, w= df.getImagesWithID(path)
-    print 'features'+str(faces.shape[1])
+    print ('features' + str(faces.shape[1]))
     # Spliting training and testing dataset
     X_train, X_test, y_train, y_test = train_test_split(faces, ids, test_size=0.25, random_state=42)
     #print ">>>>>>>>>>>>>>> "+str(y_test.size)
@@ -330,6 +330,6 @@ def detectImage(request):
 
     pred = svm_model.predict(img_pca)
     print(svm_model.best_estimator_)
-    print pred[0]
+    print(pred[0])
 
     return redirect('/records/details/'+str(pred[0]))
